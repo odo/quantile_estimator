@@ -1,0 +1,12 @@
+{application, quantile_estimator,
+ [
+  {description, ""},
+  {vsn, "0.2.1"},
+  {registered, []},
+  {applications, [
+                  kernel,
+                  stdlib
+                 ]},
+  {mod, { annalist_app, []}},
+  {env, []}
+ ]}.

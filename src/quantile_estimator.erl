@@ -9,7 +9,8 @@
 	new/1,
 	insert/2,
 	quantile/2,
-	compress/1
+	compress/1,
+	inserts_since_compression/1
 ]).
 
 -export([
@@ -23,9 +24,6 @@
 -endif.
 
 -include("quantile_estimator.hrl").
-
-% -record (group, {v :: number(), g :: number(), delta :: number(), rank :: number()}).
-% -record (quantile_estimator, {samples_count :: number(), inserts_since_compression :: number(), data :: [#group{}]})
 
 -type data_sample() :: number().
 -type invariant() :: fun((number(), number()) -> number()).
@@ -57,6 +55,10 @@ f_targeted(Phi, Epsilon) ->
 -spec new(invariant()) -> #quantile_estimator{}.
 new(Invariant) ->
 	#quantile_estimator{samples_count = 0, inserts_since_compression = 0, data_count = 0, data = [], invariant = Invariant}.
+
+-spec inserts_since_compression(#quantile_estimator{}) -> non_neg_integer().
+inserts_since_compression(#quantile_estimator{inserts_since_compression = InsertsSinceCompression}) ->
+	InsertsSinceCompression.
 
 -spec insert(data_sample(), #quantile_estimator{}) -> #quantile_estimator{}.
 insert(V, QE = #quantile_estimator{samples_count = SamplesCount, inserts_since_compression = InsertsSinceCompression, data_count = DataCount, data = Data, invariant = Invariant}) ->

@@ -61,7 +61,11 @@ When the data is uncompressed as in the example, with successive compression pas
 ```erlang
 5> erts_debug:size(QERandom).
 110066
-6> {Sizes, QERandomCompressed} = lists:foldl(fun(_, {Sizes, QE}) -> QEC = quantile_estimator:compress(QE), {[{erts_debug:size(QEC)}|Sizes], QEC} end, {[], QERandom}, lists:seq(1, 20)).
+6> {Sizes, QERandomCompressed} = lists:foldl(
+    fun(_, {Sizes, QE}) -> QEC = quantile_estimator:compress(QE), {[{erts_debug:size(QEC)}|Sizes], QEC} end
+    , {[], QERandom}
+    , lists:seq(1, 20)
+).
 {[{902},
   {902},
   {902},

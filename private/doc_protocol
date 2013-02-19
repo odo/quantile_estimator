@@ -1,0 +1,8 @@
+IV = quantile_estimator:f_targeted([{0.05, 0.005}, {0.5, 0.02}, {0.95, 0.005}]).
+QE = quantile_estimator:new(IV).
+QERandom = lists:foldl(fun(_, QE) -> quantile_estimator:insert(random:uniform(), QE) end, QE, lists:seq(1, 10000)).
+{Q005, Q05, Q095} = {quantile_estimator:quantile(0.05, QERandom), quantile_estimator:quantile(0.5, QERandom), quantile_estimator:quantile(0.95, QERandom)}.
+erts_debug:size(QERandom).
+{Sizes, QERandomCompressed} = lists:foldl(fun(_, {Sizes, QE}) -> QEC = quantile_estimator:compress(QE), {[{erts_debug:size(QEC)}|Sizes], QEC} end, {[], QERandom}, lists:seq(1, 20)).
+{Q005C, Q05C, Q095C} = {quantile_estimator:quantile(0.05, QERandomCompressed), quantile_estimator:quantile(0.5, QERandomCompressed), quantile_estimator:quantile(0.95, QERandomCompressed)}.
+{abs(Q005 - Q005C), abs(Q05 - Q05C), abs(Q095 - Q095C)}.

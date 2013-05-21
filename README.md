@@ -131,7 +131,7 @@ We can confirm that the maximum error we are expecting is probably not exceeded.
 
 ## Real world data
 
-The test data set is the population of 14593 settlements in the US which is a Pareto distribution ("long tale").
+The test data set is the population of 14593 settlements in the US which is a Pareto distribution ("long tail").
 
 # Performance
 

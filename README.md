@@ -1,6 +1,6 @@
 # Quantile estimator written in Erlang
 
-This library provides a memory-efficient data structures to store distributions of larges sets of data.
+This library provides a memory-efficient data structure to store distributions of larges sets of data.
 
 ## Source
 

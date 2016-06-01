@@ -1,19 +1,19 @@
 all: deps compile_all
 
 compile_all:
-	rebar compile
+	./rebar compile
 
 compile:
-	rebar compile skip_deps=true
+	./rebar compile skip_deps=true
 
 deps:
-	rebar get-deps
+	./rebar get-deps
 
 clean:
-	rebar clean
+	./rebar clean
 
 test:
-	TESTDIR=$(PWD)/private/ rebar skip_deps=true eunit
+	TESTDIR=$(PWD)/private/ ./rebar skip_deps=true eunit
 
 shell:
 	erl -pz ebin deps/*/ebin

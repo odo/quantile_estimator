@@ -15,8 +15,6 @@ Abstract:
 
 ## Installation
 
-quantile_estimator requires rebar: https://github.com/basho/rebar
-
 Building:
 ```
 git clone git://github.com/odo/quantile_estimator.git

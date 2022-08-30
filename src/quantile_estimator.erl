@@ -160,14 +160,6 @@ quantile(Phi, Invariant, [Next = #group{g = Gi, delta = Deltai}|DataStructure], 
 			quantile(Phi, Invariant, DataStructure, N, Rank + Gi, Next)
 	end.
 
-floor(X) ->
-    T = erlang:trunc(X),
-    case (X - T) of
-        Neg when Neg < 0 -> T - 1;
-        Pos when Pos > 0 -> T;
-        _ -> T
-    end.
-
 clamp(X) when X >= 0 -> X;
 clamp(X) when X < 0 -> 0.
 
@@ -273,7 +265,7 @@ test_quantile() ->
 	% we create a set of 1000 random values and test if the guarantees are met
 	Invariant = f_biased(0.001),
 	N = 1000,
-	Samples = [random:uniform()||_ <- lists:seq(1, N)],
+	Samples = [rand:uniform()||_ <- lists:seq(1, N)],
 	Data = lists:foldl(fun(Sample, Stats) -> insert(Sample, Stats) end, quantile_estimator:new(Invariant), Samples),
 	% error_logger:info_msg("D:~p\n", [D]),
 	validate(Samples, Invariant, Data),
@@ -288,7 +280,7 @@ test_compression_biased() ->
 	% we create a set of 1000 random values and test if the guarantees are met
 	Invariant = f_biased(0.01),
 	N = 2000,
-	Samples = [random:uniform()||_ <- lists:seq(1, N)],
+	Samples = [rand:uniform()||_ <- lists:seq(1, N)],
 	Data = lists:foldl(fun(Sample, Stats) -> insert(Sample, Stats) end, quantile_estimator:new(Invariant), Samples),
 	DL = Data#quantile_estimator.data,
 	validate(Samples, Invariant, Data),
@@ -298,7 +290,7 @@ test_comression_targeted() ->
 	% we create a set of 1000 random values and test if the guarantees are met
 	Invariant = quantile_estimator:f_targeted([{0.05, 0.005}, {0.5, 0.02}, {0.95, 0.005}]),
 	N = 2000,
-	Samples = [random:uniform()||_ <- lists:seq(1, N)],
+	Samples = [rand:uniform()||_ <- lists:seq(1, N)],
 	Data = lists:foldl(fun(Sample, Stats) -> insert(Sample, Stats) end, quantile_estimator:new(Invariant), Samples),
 	DL = Data#quantile_estimator.data,
 	validate(Samples, Invariant, Data),
@@ -339,7 +331,7 @@ validate(Samples, Invariant, Estimate = #quantile_estimator{samples_count = N, d
 			Index(quantile:quantile(Q, SamplesSort), SamplesSort), 
 			Index(quantile(Q, Estimate), SamplesSort), 
 			abs(Index(quantile:quantile(Q, SamplesSort), SamplesSort) - Index(quantile(Q, Estimate), SamplesSort)),
-			quantile:ceil(Invariant(Index(quantile(Q, Estimate), SamplesSort), N))
+			ceil(Invariant(Index(quantile(Q, Estimate), SamplesSort), N))
 		} || Q <- Quantiles],
 	% [error_logger:info_msg("QReal:~p,~p,~p\n", [Q, N, quantile:quantile(Q, SamplesSort)]) || Q <- [0.0, 1.0]],
 	% [error_logger:info_msg("QEst:~p,~p,~p\n", [Q, N, quantile(Q, Invariant, Estimate)]) || Q <- [0.0, 1.0]],

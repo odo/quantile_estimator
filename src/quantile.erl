@@ -13,6 +13,8 @@
 -export([quantile/2]).
 -export([rank_average/2]).
 
+-compile({no_auto_import,[ceil/1]}).
+
 -spec quantile(float(), samples()) -> sample().
 quantile(0.0, [First|_]) ->
 	First;

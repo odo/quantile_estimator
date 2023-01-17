@@ -18,6 +18,8 @@
 	f_targeted/1
 ]).
 
+-compile({no_auto_import,[floor/1]}).
+
 -ifdef(TEST).
 -include_lib("eunit/include/eunit.hrl").
 -define(DEBUG, true).

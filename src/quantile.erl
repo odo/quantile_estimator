@@ -14,7 +14,7 @@
 -export([rank_average/2]).
 
 -spec quantile(float(), samples()) -> sample().
-quantile(0.0, [First|_]) ->
+quantile(Num, [First|_]) when Num == 0.0 ->
 	First;
 
 quantile(1.0, Samples) ->

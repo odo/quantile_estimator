@@ -13,6 +13,8 @@ Abstract:
 
 "Skew is prevalent in many data sources such as IP traffic streams. To continually summarize the distribution of such data, a high-biased set of quantiles (e.g., 50th, 90th and 99th percentiles) with finer error guarantees at higher ranks (e.g., errors of 5, 1 and 0.1 percent, respectively) is more useful than uniformly distributed quantiles (e.g., 25th, 50th and 75th percentiles) with uniform error guarantees. In this paper, we address the following two problems. First, can we compute quantiles with finer error guarantees for the higher ranks of the data distribution effectively, using less space and computation time than computing all quantiles uniformly at the finest error? Second, if specific quantiles and their error bounds are requested a priori, can the necessary space usage and computation time be reduced? We answer both questions in the affirmative by formalizing them as the “high-biased ” and the “targeted ” quantiles problems, respectively, and presenting algorithms with provable guarantees, that perform significantly better than previously known solutions for these problems. We implemented our algorithms in the Gigascope data stream management system, and evaluated alternate approaches for maintaining the relevant summary structures. Our experimental results on real and synthetic IP data streams complement our theoretical analyses, and highlight the importance of lightweight, non-blocking implementations when maintaining summary structures over high-speed data streams."
 
+The full text publication is included in the `doc/cormode_et_al.pdf` (with permission of the author).
+
 ## Installation
 
 Building:
@@ -129,7 +131,7 @@ We can confirm that the maximum error we are expecting is probably not exceeded.
 
 ## Real world data
 
-The test data set is the population of 14593 settlements in the US which is a Pareto distribution ("long tail").
+The test data set is the population of 14593 settlements in the US which is a Pareto distribution ("long tail"). Please find the example data in the `private` directory.
 
 # Performance
 

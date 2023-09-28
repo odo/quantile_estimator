@@ -137,7 +137,7 @@ When inserting the test data (14593 numbers) and compressing every 10 inserts th
 
 # Compression rate
 
-When compressions every 10 inserts, the size of the data structure converges to around 60 elements / bins.
+When compressing every 10 inserts, the size of the data structure converges to around 60 elements / bins.
 
 ![compression rate](https://raw.github.com/odo/quantile_estimator/master/doc/compression.png "compression rate")
 

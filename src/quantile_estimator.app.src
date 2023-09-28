@@ -1,7 +1,13 @@
 {application, quantile_estimator,
  [
-  {description, ""},
+  {description, "A quantile estimator written in Erlang"},
   {vsn, "0.2.1"},
+  {licenses, ["MIT"]},
+  {ex_doc, [
+      {source_url, <<"https://github.com/odo/quantile_estimator">>},
+      {main, <<"README.md">>},
+      {extras, [<<"LICENSE">>]}
+  ]},
   {registered, []},
   {applications, [
                   kernel,

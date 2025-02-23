@@ -2,3 +2,6 @@ ebin
 .eunit
 .DS_Store
 .rebar
+doc/
+_build/
+rebar3.crashdump

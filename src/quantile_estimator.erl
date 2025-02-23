@@ -1,9 +1,7 @@
+%% @doc
+%% Based on: Cormode et. al.: "Effective Computation of Biased Quantiles over Data Streams"
 -module(quantile_estimator).
 -author('Florian Odronitz <odo@mac.com>').
-
-% Based on:
-% Cormode et. al.:
-% "Effective Computation of Biased Quantiles over Data Streams"
 
 -export([
 	new/1,
@@ -27,6 +25,7 @@
 
 -type data_sample() :: number().
 -type invariant() :: fun((number(), number()) -> number()).
+-export_type([data_sample/0, invariant/0]).
 	
 -spec f_biased(number()) -> invariant().
 f_biased(Epsilon) ->

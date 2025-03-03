@@ -8,18 +8,23 @@
 
 -type sample() :: number().
 -type samples() :: [sample()].
+-export_type([sample/0, samples/0]).
 
 -export([quantile/2]).
 -export([rank_average/2]).
 
 -spec quantile(float(), samples()) -> sample().
-quantile(Num, [First|_]) when Num == 0.0 ->
+quantile(Num, Samples) when is_number(Num), is_list(Samples) ->
+    quantile_1(Num, Samples).
+
+-spec quantile_1(float(), samples()) -> sample().
+quantile_1(Num, [First|_]) when Num == 0.0 ->
 	First;
 
-quantile(1.0, Samples) ->
+quantile_1(1.0, Samples) ->
 	lists:last(Samples);
 	
-quantile(Quantile, Samples) ->
+quantile_1(Quantile, Samples) ->
 	case ranks(length(Samples), Quantile) of
 		[Index] ->
 			lists:nth(Index, Samples);

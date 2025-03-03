@@ -1,9 +1,7 @@
+%% @doc
+%% Based on: Cormode et. al.: "Effective Computation of Biased Quantiles over Data Streams"
 -module(quantile_estimator).
 -author('Florian Odronitz <odo@mac.com>').
-
-% Based on:
-% Cormode et. al.:
-% "Effective Computation of Biased Quantiles over Data Streams"
 
 -export([
 	new/1,
@@ -27,6 +25,7 @@
 
 -type data_sample() :: number().
 -type invariant() :: fun((number(), number()) -> number()).
+-export_type([data_sample/0, invariant/0]).
 	
 -spec f_biased(number()) -> invariant().
 f_biased(Epsilon) ->
@@ -61,7 +60,8 @@ inserts_since_compression(#quantile_estimator{inserts_since_compression = Insert
 	InsertsSinceCompression.
 
 -spec insert(data_sample(), #quantile_estimator{}) -> #quantile_estimator{}.
-insert(V, QE = #quantile_estimator{samples_count = SamplesCount, inserts_since_compression = InsertsSinceCompression, data_count = DataCount, data = Data, invariant = Invariant}) ->
+insert(V, QE = #quantile_estimator{samples_count = SamplesCount, inserts_since_compression = InsertsSinceCompression, data_count = DataCount, data = Data, invariant = Invariant})
+  when is_number(V), is_list(Data) ->
 	QE#quantile_estimator{
 		samples_count = SamplesCount + 1,
 		inserts_since_compression = InsertsSinceCompression + 1,
@@ -69,21 +69,10 @@ insert(V, QE = #quantile_estimator{samples_count = SamplesCount, inserts_since_c
 		data = insert(V, Data, SamplesCount, Invariant, 0)
 	}.
 
-% we terminate and the group has been added
-insert(undefined, [], _N, _Invariant, _Rank) ->
-	[];
-
 % we terminate but the group has not been added yet
 % so this is the maximum value
 insert(V, [], _, _, RankLast) ->
 	[#group{v = V, g = 1, delta = 0, rank = RankLast + 1}];
-
-% the group has already been inserted, just append
-% and increase the rank by 1
-insert(undefined, [Next = #group{rank = RankNext}|DataTail], N, _, undefined) ->
-	NextUpdated = Next#group{rank = RankNext + 1},
-	[NextUpdated|insert(undefined, DataTail, N, undefiend, undefined)];
-
 % the group has not yet been insterted
 % insert it and continue
 insert(V, [Next = #group{v = Vi, g = Gi, rank = RankNext}|DataTail], N, Invariant, RankLast) ->
@@ -96,14 +85,24 @@ insert(V, [Next = #group{v = Vi, g = Gi, rank = RankNext}|DataTail], N, Invarian
 				true  -> #group{v = V, g = 1, delta = 0, rank = RankLast + 1};
 				false -> #group{v = V, g = 1, delta = clamp(floor(Invariant(Ranki, N)) - 1), rank = RankLast +1}
 			end,
-			[GroupNew|[Next#group{rank = RankNext + 1}|insert(undefined, DataTail, N, undefiend, undefined)]];
+			[GroupNew|[Next#group{rank = RankNext + 1}|insert_tail(DataTail)]];
 		false ->
 			[Next|insert(V, DataTail, N, Invariant, Ranki)]
 	end.
 
+% we terminate and the group has been added
+insert_tail([]) ->
+	[];
+
+% the group has already been inserted, just append
+% and increase the rank by 1
+insert_tail([Next = #group{rank = RankNext}|DataTail]) ->
+	NextUpdated = Next#group{rank = RankNext + 1},
+	[NextUpdated|insert_tail(DataTail)].
+
 -spec compress(#quantile_estimator{}) -> #quantile_estimator{}.
 compress(QE = #quantile_estimator{samples_count = N, data = Data, invariant = Invariant}) ->
-	DataCompressed = lists:reverse(compress(Invariant, N, lists:reverse(Data), undefined)),
+	DataCompressed = lists:reverse(compress_1(Invariant, N, lists:reverse(Data))),
 	QE#quantile_estimator{
 		samples_count = N,
 		inserts_since_compression = 0,
@@ -112,27 +111,28 @@ compress(QE = #quantile_estimator{samples_count = N, data = Data, invariant = In
 	}.
 
 % This is the first call that just splits off one group as a merge candidate
-compress(Invariant, N, [Next | Rest], undefined)->
-	compress(Invariant, N, Rest, Next);
+compress_1(_, _, []) ->
+    [];
+compress_1(Invariant, N, [Next | Rest]) ->
+    compress_2(Invariant, N, Rest, Next).
 
 % only one group is left
-compress(_, _, [], Last) ->
+compress_2(_, _, [], Last) ->
 	[Last];
 
 % we never merge the two last groups since the edge groups need to be untouched
-compress(_, _, [Next], Last) ->
+compress_2(_, _, [Next], Last) ->
 	[Last|[Next]];
 
-compress(Invariant, N, [Next = #group{g = Gi, rank = Ranki} | Rest], Last = #group{g = Giplusone, delta = Deltaiplusone}) ->
+compress_2(Invariant, N, [Next = #group{g = Gi, rank = Ranki} | Rest], Last = #group{g = Giplusone, delta = Deltaiplusone}) ->
 	% 		error_logger:info_msg("Rank:~p\n", [Ranki]),
 	% error_logger:info_msg("comress ~p =< ~p \n", [(Gi + Giplusone + Deltaiplusone), Invariant(Ranki, N)]),
 	% 		error_logger:info_msg("Last:~p\n", [Last]),
 	case Gi + Giplusone + Deltaiplusone =< Invariant(Ranki, N) of
 		true ->
-			% [Last|[Next|compress(Invariant, N, Rest, Ranki + Gi, undefined)]];
-			[merge(Last, Next)|compress(Invariant, N, Rest, undefined)];
+			[merge(Last, Next)|compress_1(Invariant, N, Rest)];
 		false ->
-			[Last|compress(Invariant, N, Rest, Next)]
+			[Last|compress_2(Invariant, N, Rest, Next)]
 	end.
 
 merge(#group{g = Giplusone, v = Viplusone, delta = Deltaiplusone, rank = Rankiplusone}, #group{g = Gi, rank = Ranki}) ->
